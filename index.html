@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invest Class</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">IC</span><div><strong>INVEST CLASS</strong><small>Plataforma de inversión académica</small></div></div>
+    <div id="sessionInfo" class="session-info"></div>
+  </header>
+
+  <main>
+    <section id="loginView" class="login-layout">
+      <div class="intro">
+        <span class="eyebrow">SIMULACIÓN DE INVERSIONES</span>
+        <h1>Las ideas también<br><em>se financian.</em></h1>
+        <p>Reparte tu presupuesto entre las presentaciones de clase y modifica tus inversiones en cada ronda.</p>
+        <div class="intro-points"><span>✓ 10.000 € por alumno</span><span>✓ Rondas sucesivas</span><span>✓ Inversiones anónimas</span></div>
+      </div>
+      <form id="loginForm" class="panel login-card">
+        <div class="eyebrow">ACCESO A LA PLATAFORMA</div>
+        <h2>Bienvenido</h2>
+        <label>Usuario<input id="username" autocomplete="username" required placeholder="Tu usuario"></label>
+        <label>Contraseña<input id="password" type="password" autocomplete="current-password" required placeholder="Tu contraseña"></label>
+        <button class="primary" type="submit">Entrar <span>→</span></button>
+        <p id="loginError" class="error" role="alert"></p>
+        <div class="demo-box"><strong>¿Cómo entro?</strong><br>Usuario: tu nombre en minúsculas.<br>Contraseña: las 3 primeras letras de tu primer apellido (en minúsculas) + el día de tu cumpleaños con dos cifras.<br>Ejemplo: Juan Gómez, nacido el 03 de marzo → Usuario: <code>juan</code> · Contraseña: <code>gom03</code></div>
+      </form>
+    </section>
+
+    <section id="appView" class="hidden">
+      <div class="page-heading">
+        <div><span class="eyebrow" id="roleLabel">PANEL</span><h1 id="welcomeTitle">Hola</h1><p id="welcomeText">Gestiona tus inversiones.</p></div>
+        <button id="logoutBtn" class="button secondary">Cerrar sesión</button>
+      </div>
+      <div id="studentPanel" class="hidden">
+        <div class="stats">
+          <article class="stat-card"><span>Presupuesto inicial</span><strong id="studentBudget">10.000 €</strong></article>
+          <article class="stat-card"><span>Invertido actualmente</span><strong id="studentInvested">0 €</strong></article>
+          <article class="stat-card accent"><span>Dinero disponible</span><strong id="studentAvailable">10.000 €</strong></article>
+        </div>
+        <div class="section-head"><div><span class="eyebrow">RONDA ACTIVA</span><h2 id="studentRoundTitle">Sin ronda abierta</h2></div><span id="studentRoundStatus" class="status">Cerrada</span></div>
+        <div id="studentRoundMessage" class="notice"></div>
+        <div id="presentationCards" class="presentation-grid"></div>
+        <div class="section-head"><div><span class="eyebrow">TU ACTIVIDAD</span><h2>Historial de movimientos</h2></div></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Fecha</th><th>Ronda</th><th>Presentación</th><th>Cambio</th><th>Inversión final</th></tr></thead><tbody id="studentHistory"></tbody></table></div>
+      </div>
+
+      <div id="teacherPanel" class="hidden">
+        <div class="stats">
+          <article class="stat-card"><span>Alumnos registrados</span><strong id="teacherStudents">0</strong></article>
+          <article class="stat-card"><span>Presentaciones</span><strong id="teacherPresentations">0</strong></article>
+          <article class="stat-card accent"><span>Rondas creadas</span><strong id="teacherRounds">0</strong></article>
+        </div>
+        <section class="panel teacher-students">
+          <span class="eyebrow">GESTIÓN DE ALUMNOS</span><h2>Crear alumno</h2>
+          <form id="studentForm" class="inline-form student-form" autocomplete="off">
+            <input id="studentUsername" required placeholder="Usuario" autocapitalize="none">
+            <input id="studentPassword" required placeholder="Contraseña">
+            <button class="primary" type="submit">Crear alumno</button>
+          </form>
+          <p id="studentMsg" class="form-msg" role="status"></p>
+          <p class="muted">Cada alumno nuevo recibe 10.000 € de presupuesto. Puedes añadir más dinero a uno o a todos (con un número negativo se resta).</p>
+          <form id="allMoneyForm" class="inline-form money-all"><input id="allMoneyAmount" type="number" step="50" required placeholder="€ para todos los alumnos"><button class="primary" type="submit">Añadir a todos</button></form>
+          <div id="studentList" class="stack-list"></div>
+        </section>
+        <div class="teacher-grid">
+          <section class="panel">
+            <span class="eyebrow">CONTROL DE RONDAS</span><h2>Rondas</h2>
+            <form id="roundForm" class="inline-form"><input id="roundName" required placeholder="Ej. Ronda 2"><button class="primary" type="submit">Crear ronda</button></form>
+            <div id="roundList" class="stack-list"></div>
+          </section>
+          <section class="panel">
+            <span class="eyebrow">CONTENIDO DE CLASE</span><h2>Presentaciones</h2>
+            <form id="presentationForm" class="inline-form pres-form"><input id="presentationName" required placeholder="Nombre de la presentación"><textarea id="presentationDesc" rows="2" maxlength="250" placeholder="Breve descripción (opcional)"></textarea><input id="presentationOwners" placeholder="Autores: @usuario1 @usuario2 (no podrán pujar en ella)" autocapitalize="none"><button class="primary" type="submit">Añadir</button></form>
+            <p id="presentationMsg" class="form-msg" role="status"></p>
+            <div id="presentationList" class="stack-list"></div>
+          </section>
+        </div>
+        <section class="panel teacher-ledger">
+          <div class="section-head"><div><span class="eyebrow">VISTA PRIVADA DEL PROFESOR</span><h2>Dinero de cada alumno</h2></div><span class="status">Identidades visibles</span></div>
+          <p class="muted">Esta tabla es privada para el profesor. Los alumnos solo ven totales anónimos por presentación.</p>
+          <div class="table-wrap"><table><thead><tr><th>Alumno</th><th>Invertido</th><th>Disponible</th><th>Detalle por presentación</th></tr></thead><tbody id="teacherLedger"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <span class="eyebrow">RESUMEN ANÓNIMO</span><h2>Total por presentación</h2>
+          <div id="anonymousTotals" class="totals-list"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <footer>INVEST CLASS <span>Prototipo inicial</span></footer>
+  <script src="app.js"></script>
+</body>
+</html>
