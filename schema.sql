@@ -50,7 +50,7 @@ alter table sessions enable row level security;
 revoke all on all tables in schema public from anon, authenticated;
 
 -- Profesor inicial (usuario y contraseña como en el prototipo). CÁMBIALA antes de usarlo en clase.
-insert into users(username,password,name,role) values ('profe','admin123','Profesor','teacher');
+insert into users(username,password,name,role) values ('profe','CAMBIAR_ESTA_CLAVE','Profesor','teacher');
 
 -- ---------- Ayudas internas ----------
 create function ic_user(p_token uuid) returns users language plpgsql security definer set search_path=public as $$
@@ -155,7 +155,7 @@ create function delete_student(p_token uuid, p_user text) returns void language 
 begin
   perform ic_teacher(p_token);
   delete from users where id=p_user and role='student';
-  update presentations set owners=array_remove(owners,p_user);
+  update presentations set owners=array_remove(owners,p_user) where p_user=any(owners);
 end $$;
 
 create function create_round(p_token uuid, p_name text) returns void language plpgsql security definer set search_path=public as $$
@@ -163,22 +163,29 @@ declare rid text;
 begin
   perform ic_teacher(p_token);
   if trim(coalesce(p_name,''))='' then raise exception 'Escribe un nombre.'; end if;
-  update rounds set status='closed';
+  update rounds set status='closed' where status<>'closed';
   insert into rounds(name,status) values (trim(p_name),'open') returning id into rid;
-  update app_state set current_round_id=rid;
+  update app_state set current_round_id=rid where id=1;
 end $$;
 
 create function set_round(p_token uuid, p_round text, p_open boolean) returns void language plpgsql security definer set search_path=public as $$
 begin
   perform ic_teacher(p_token);
   if p_open then
-    update rounds set status='closed';
+    update rounds set status='closed' where status<>'closed';
     update rounds set status='open' where id=p_round;
-    update app_state set current_round_id=p_round;
+    update app_state set current_round_id=p_round where id=1;
   else
     update rounds set status='closed' where id=p_round;
     update app_state set current_round_id=null where current_round_id=p_round;
   end if;
+end $$;
+
+create function delete_round(p_token uuid, p_round text) returns void language plpgsql security definer set search_path=public as $$
+begin
+  perform ic_teacher(p_token);
+  update app_state set current_round_id=null where current_round_id=p_round;
+  delete from rounds where id=p_round;
 end $$;
 
 create function add_presentation(p_token uuid, p_name text, p_desc text, p_owners text[]) returns void language plpgsql security definer set search_path=public as $$

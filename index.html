@@ -24,7 +24,7 @@
         <div class="eyebrow">ACCESO A LA PLATAFORMA</div>
         <h2>Bienvenido</h2>
         <label>Usuario<input id="username" autocomplete="username" required placeholder="Tu usuario"></label>
-        <label>Contraseña<input id="password" type="password" autocomplete="current-password" required placeholder="Tu contraseña"></label>
+        <label>Contraseña<span class="pass-wrap"><input id="password" type="password" autocomplete="current-password" required placeholder="Tu contraseña"><button type="button" id="togglePass" class="eye-btn" aria-label="Mostrar u ocultar la contraseña">Mostrar</button></span></label>
         <button class="primary" type="submit">Entrar <span>→</span></button>
         <p id="loginError" class="error" role="alert"></p>
         <div class="demo-box"><strong>¿Cómo entro?</strong><br>Usuario: tu nombre en minúsculas.<br>Contraseña: las 3 primeras letras de tu primer apellido (en minúsculas) + el día de tu cumpleaños con dos cifras.<br>Ejemplo: Juan Gómez, nacido el 03 de marzo → Usuario: <code>juan</code> · Contraseña: <code>gom03</code></div>

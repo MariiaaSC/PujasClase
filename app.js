@@ -48,8 +48,17 @@ document.getElementById("loginForm").addEventListener("submit", async e=>{
     const r=await rpc("login",{p_username:username,p_password:password});
     token=r.token; sessionStorage.setItem("ic_token",token);
     await refresh(true); document.getElementById("loginError").textContent=""; startSession();
-  }catch(err){ document.getElementById("loginError").textContent=err.message; }
+  }catch(err){
+    const msg=/incorrectos/i.test(err.message)?"Usuario o contraseña incorrectos. Revisa las mayúsculas y que no haya espacios.":err.message;
+    document.getElementById("loginError").textContent=msg;
+    document.getElementById("password").focus();
+  }
 });
+document.getElementById("togglePass").addEventListener("click",()=>{
+  const i=document.getElementById("password"), b=document.getElementById("togglePass");
+  const show=i.type==="password"; i.type=show?"text":"password"; b.textContent=show?"Ocultar":"Mostrar";
+});
+["username","password"].forEach(id=>document.getElementById(id).addEventListener("input",()=>{document.getElementById("loginError").textContent="";}));
 document.getElementById("logoutBtn").addEventListener("click",()=>{
   currentUser=null; token=null; sessionStorage.removeItem("ic_token"); clearInterval(poll); show("appView",false); show("loginView",true); document.getElementById("sessionInfo").textContent="";
   document.getElementById("loginForm").reset();
@@ -125,7 +134,12 @@ function renderTeacher(){
     if(!confirm(`¿Eliminar a ${u.name}? Se borrarán también sus inversiones y movimientos.`))return;
     act("delete_student",{p_user:u.id});
   }));
-  document.getElementById("roundList").innerHTML=db.rounds.slice().reverse().map(r=>`<div class="list-item"><div><strong>${escapeHtml(r.name)}</strong><small>${r.status==="open"?"Abierta":"Cerrada"}</small></div><button class="secondary" data-round="${r.id}" data-action="${r.status==="open"?"close":"open"}">${r.status==="open"?"Cerrar ronda":"Abrir ronda"}</button></div>`).join("");
+  document.getElementById("roundList").innerHTML=db.rounds.slice().reverse().map(r=>`<div class="list-item"><div><strong>${escapeHtml(r.name)}</strong><small>${r.status==="open"?"Abierta":"Cerrada"}</small></div><div class="item-actions"><button class="secondary" data-round="${r.id}" data-action="${r.status==="open"?"close":"open"}">${r.status==="open"?"Cerrar ronda":"Abrir ronda"}</button><button class="secondary" data-delround="${r.id}">Eliminar</button></div></div>`).join("");
+  document.querySelectorAll("[data-delround]").forEach(btn=>btn.addEventListener("click",()=>{
+    const r=db.rounds.find(x=>x.id===btn.dataset.delround); if(!r)return;
+    if(!confirm(`¿Eliminar "${r.name}"? Las inversiones de los alumnos no cambian, pero en su historial esa ronda aparecerá como "—".`))return;
+    act("delete_round",{p_round:r.id});
+  }));
   document.querySelectorAll("[data-round]").forEach(btn=>btn.addEventListener("click",()=>{
     const r=db.rounds.find(x=>x.id===btn.dataset.round);
     act("set_round",{p_round:r.id,p_open:btn.dataset.action==="open"});
